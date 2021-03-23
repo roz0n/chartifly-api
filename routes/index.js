@@ -10,8 +10,8 @@ const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
 
 function encodeCredentials(id, secret) {
-  let data = `${id}:${secret}`;
-  let buffer = Buffer.from(data);
+  const data = `${id}:${secret}`;
+  const buffer = Buffer.from(data);
   return buffer.toString("base64");
 }
 
@@ -35,6 +35,8 @@ router.get("/token", async (req, res, next) => {
       data: querystring.stringify(body),
     });
 
+    // TODO: This doesn't need to be stored in the client, this token is for the server to make subsequent requests
+    // Store this token and its expiration in the DB
     res.send({
       success: true,
       token: data.access_token,
@@ -62,7 +64,7 @@ router.get("/tracklist/:region", async (req, res, next) => {
     // `data` is a csv string
     const options = {
       noheader: true,
-      headers: ["position", "track Name", "artist", "streams", "url"],
+      headers: ["position", "trackName", "artist", "streams", "url"],
       output: "json",
     };
     let output = await csv(options).fromString(data);
