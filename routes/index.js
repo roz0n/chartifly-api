@@ -1,5 +1,6 @@
 const axios = require("axios");
 const querystring = require("querystring");
+const csv = require("csvtojson");
 
 var express = require("express");
 var router = express.Router();
@@ -51,11 +52,26 @@ router.get("/token", async (req, res, next) => {
 // TRACKLIST
 router.get("/tracklist/:region", async (req, res, next) => {
   try {
-    let { region } = req.params;
+    const { region } = req.params;
+    const endpoint = `https://spotifycharts.com/regional/${region}/daily/latest/download`;
+    const { data } = await axios({
+      method: "get",
+      url: endpoint,
+    });
+
+    // `data` is a csv string
+    const options = {
+      noheader: true,
+      headers: ["position", "track Name", "artist", "streams", "url"],
+      output: "json",
+    };
+    let output = await csv(options).fromString(data);
+    output.splice(0, 2)
 
     res.send({
       success: true,
-      for: region,
+      region,
+      data: output,
     });
   } catch (error) {
     res.status(500).send({
