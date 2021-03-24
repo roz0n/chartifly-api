@@ -1,5 +1,7 @@
-const dotenv = require("dotenv").config();
-const _ = require("./db");
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
+}
+require("./db");
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
