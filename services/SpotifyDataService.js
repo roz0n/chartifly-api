@@ -1,18 +1,7 @@
 const db = require("../db");
 const axios = require("axios");
 const querystring = require("querystring");
-
-function Token(token, type, creationDate, expirationDate) {
-  this.token = token;
-  this.type = type;
-  this.creationDate = creationDate;
-  this.expirationDate = expirationDate;
-}
-
-function handleTokenDates(currentTime, expirationTime) {
-  const expirationMs = expirationTime * 1000;
-  return new Date(currentTime.getTime() + expirationMs);
-}
+const Token = require("../models/Token");
 
 class SpotifyDataService {
   CLIENT_ID = process.env.CLIENT_ID;
@@ -35,7 +24,6 @@ class SpotifyDataService {
     try {
       const collection = db.get("token");
       const body = { grant_type: "client_credentials" };
-
       const { data } = await axios({
         method: "post",
         url: this.endpoints.getToken,
@@ -47,22 +35,21 @@ class SpotifyDataService {
         },
         data: querystring.stringify(body),
       });
-
       const currentTime = new Date();
-
       const token = new Token(
         data.access_token,
         data.token_type,
         currentTime,
-        handleTokenDates(currentTime, data.expires_in)
+        null
+      );
+      token.expirationDate = token.calculateExpirationDate(
+        currentTime,
+        token.expires_in
       );
 
       await collection.insert(token);
       await db.close();
-
-      console.log("Successfully issued new auth token!");
-      console.table(token);
-
+      
       return token;
     } catch (error) {
       console.log("Error issuing auth token:", error.stack);

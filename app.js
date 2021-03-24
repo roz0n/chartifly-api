@@ -1,15 +1,21 @@
 const dotenv = require("dotenv").config();
-const db = require("./db");
+const _ = require("./db");
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
-const indexRouter = require("./routes/index");
 const app = express();
 
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+
+const indexRouter = require("./routes/index");
+const trackRouter = require("./routes/track");
+const tracklistRouter = require("./routes/tracklist");
+
 app.use("/", indexRouter);
+app.use("/track", trackRouter);
+app.use("/tracklist", tracklistRouter);
 
 module.exports = app;
