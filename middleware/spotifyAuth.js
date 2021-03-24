@@ -24,7 +24,7 @@ async function spotifyAuth(req, res, next) {
         await db.close();
         return next();
       } else {
-        console.log("Token is not expired, proceed with request");
+        // Token is not expired, proceed with request
         return next();
       }
     }
