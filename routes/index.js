@@ -17,10 +17,17 @@ function encodeCredentials(id, secret) {
   return buffer.toString("base64");
 }
 
-function Token(token, type, expiration) {
+// TOKEN HELPERS
+function Token(token, type, creationDate, expirationDate) {
   this.token = token;
   this.type = type;
-  this.expiration = expiration;
+  this.creationDate = creationDate;
+  this.expirationDate = expirationDate;
+}
+
+function handleTokenDates(currentTime, expirationTime) {
+  const expirationMs = expirationTime * 1000;
+  return new Date(currentTime.getTime() + expirationMs);
 }
 
 // TEST ROUTE
@@ -45,16 +52,17 @@ router.get("/token", async (req, res, next) => {
       data: querystring.stringify(body),
     });
 
-    // TODO: This could be in a middleware
+    const currentTime = new Date();
+
     const token = new Token(
       data.access_token,
       data.token_type,
-      // TODO: Do date math
-      data.expires_in
+      currentTime,
+      handleTokenDates(currentTime, data.expires_in)
     );
-    collection.insert(token).then(() => {
-      db.close()
-    });
+
+    await collection.insert(token);
+    await db.close();
 
     res.send({
       success: true,
@@ -63,7 +71,7 @@ router.get("/token", async (req, res, next) => {
     console.log("Error:", error);
     res.status(500).send({
       success: false,
-      error: "Failed to obtain access token",
+      error: "Spotify authentication failure",
     });
   }
 });
@@ -114,7 +122,8 @@ router.get("/track/:id", async (req, res, next) => {
     const collection = db.get("token");
     const query = await collection.findOne();
     const { token } = query;
-    
+    await db.close();
+
     const { data } = await axios({
       method: "get",
       url: endpoint,
