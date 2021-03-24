@@ -17,8 +17,7 @@ router.get("/:id", async (req, res, next) => {
     const collection = db.get("token");
     const query = await collection.findOne();
     const { token } = query;
-    await db.close();
-
+    
     // Fetch data
     const { data } = await axios({
       method: "get",

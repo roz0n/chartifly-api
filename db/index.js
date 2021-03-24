@@ -5,7 +5,12 @@ const db = require("monk")(uri);
 
 db.then(() => {
   console.log("Successfully connected to MongoDB");
-  db.close();
+});
+
+process.on("SIGINT", async () => {
+  await db.close();
+  console.log("MongoDB connection closed gracefully");
+  process.exit(0);
 });
 
 module.exports = db;

@@ -46,10 +46,7 @@ class SpotifyDataService {
         currentTime,
         token.expires_in
       );
-
-      await collection.insert(token);
-      await db.close();
-      
+      await collection.insert(token);      
       return token;
     } catch (error) {
       console.log("Error issuing auth token:", error.stack);

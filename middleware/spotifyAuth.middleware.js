@@ -9,7 +9,6 @@ async function spotifyAuth(req, res, next) {
     if (!query) {
       // No token present in database, create it
       await SpotifyDataService.issueToken();
-      await db.close();
       return next();
     } else {
       // Token present in database, check if expired by checking if currentTime is greater than expirationDate
@@ -21,7 +20,6 @@ async function spotifyAuth(req, res, next) {
         // Token is expired, delete the old token and issue a new one
         await collection.remove({ token: token });
         await SpotifyDataService.issueToken();
-        await db.close();
         return next();
       } else {
         // Token is not expired, proceed with request
