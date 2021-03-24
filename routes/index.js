@@ -8,8 +8,6 @@ const spotifyAuth = require("../middleware/spotifyAuth");
 const express = require("express");
 const router = express.Router();
 
-router.use(spotifyAuth);
-
 // CREDS
 const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
@@ -113,7 +111,7 @@ router.get("/tracklist/:region", async (req, res, next) => {
 
 // TRACK
 // This is the only route that needs Spotify authentication
-router.get("/track/:id", async (req, res, next) => {
+router.get("/track/:id", spotifyAuth, async (req, res, next) => {
   try {
     // TODO: Move to class
     const { id } = req.params;
