@@ -2,8 +2,8 @@ const axios = require("axios");
 const querystring = require("querystring");
 const csv = require("csvtojson");
 
-var express = require("express");
-var router = express.Router();
+const express = require("express");
+const router = express.Router();
 
 // CREDS
 const CLIENT_ID = process.env.CLIENT_ID;
@@ -68,7 +68,7 @@ router.get("/tracklist/:region", async (req, res, next) => {
       output: "json",
     };
     let output = await csv(options).fromString(data);
-    output.splice(0, 2)
+    output.splice(0, 2);
 
     res.send({
       success: true,
@@ -78,23 +78,35 @@ router.get("/tracklist/:region", async (req, res, next) => {
   } catch (error) {
     res.status(500).send({
       success: false,
-      error: "Failed to obtain region tracklist",
+      error: "Failed to get region tracklist",
     });
   }
 });
 
 // TRACK
-router.get("/tracklist/:region", async (req, res, next) => {
+router.get("/track/:id", async (req, res, next) => {
   try {
-    let { region } = req.params;
+    const { id } = req.params;
+
+    if (!id) throw new Error("No track id provided");
+
+    const endpoint = "https://api.spotify.com/v1/tracks/${id}";
+    const { data } = await axios({
+      method: "get",
+      url: endpoint,
+      headers: {
+        Authorization: `Bearer xxx`,
+      },
+    });
+
     res.send({
       success: true,
-      for: region,
+      data
     });
   } catch (error) {
     res.status(500).send({
       success: false,
-      error: "Failed to obtain region tracklist",
+      error: error.message || "Failed to get track data",
     });
   }
 });
