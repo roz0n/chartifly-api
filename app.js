@@ -1,8 +1,9 @@
+const dotenv = require("dotenv").config();
+const db = require("./db");
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const indexRouter = require("./routes/index");
-const _ = require("./db");
 const app = express();
 
 app.use(logger("dev"));
