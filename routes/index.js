@@ -32,7 +32,7 @@ router.get("/", function (req, res, next) {
 // TODO: I don't think this needs to be a publicly accessible route
 router.get("/token", async (req, res, next) => {
   try {
-    const collection = db.get("tokens");
+    const collection = db.get("token");
     const body = { grant_type: "client_credentials" };
     const endpoint = "https://accounts.spotify.com/api/token";
 
@@ -54,8 +54,6 @@ router.get("/token", async (req, res, next) => {
     );
     collection.insert(token);
 
-    // TODO: This doesn't need to be stored in the client, this token is for the server to make subsequent requests
-    // Store this token and its expiration in the DB
     res.send({
       success: true,
     });
@@ -101,13 +99,15 @@ router.get("/tracklist/:region", async (req, res, next) => {
 });
 
 // TRACK
+// This is the only route that needs Spotify authentication
 router.get("/track/:id", async (req, res, next) => {
   try {
-    const { id } = req.params;
-
-    if (!id) throw new Error("No track id provided");
-
+    // TODO: Move to class
     const endpoint = "https://api.spotify.com/v1/tracks/${id}";
+    const { id } = req.params;
+    
+    if (!id) throw new Error("No track id provided");
+    
     const { data } = await axios({
       method: "get",
       url: endpoint,
