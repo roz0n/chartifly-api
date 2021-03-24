@@ -52,7 +52,9 @@ router.get("/token", async (req, res, next) => {
       // TODO: Do date math
       data.expires_in
     );
-    collection.insert(token);
+    collection.insert(token).then(() => {
+      db.close()
+    });
 
     res.send({
       success: true,
@@ -103,16 +105,21 @@ router.get("/tracklist/:region", async (req, res, next) => {
 router.get("/track/:id", async (req, res, next) => {
   try {
     // TODO: Move to class
-    const endpoint = "https://api.spotify.com/v1/tracks/${id}";
     const { id } = req.params;
-    
     if (!id) throw new Error("No track id provided");
+
+    const endpoint = `https://api.spotify.com/v1/tracks/${id}`;
+
+    // Get token
+    const collection = db.get("token");
+    const query = await collection.findOne();
+    const { token } = query;
     
     const { data } = await axios({
       method: "get",
       url: endpoint,
       headers: {
-        Authorization: `Bearer xxx`,
+        Authorization: `Bearer ${token}`,
       },
     });
 
@@ -121,6 +128,7 @@ router.get("/track/:id", async (req, res, next) => {
       data,
     });
   } catch (error) {
+    console.log("ERROR", error);
     res.status(500).send({
       success: false,
       error: error.message || "Failed to get track data",

@@ -5,9 +5,6 @@ const db = require("monk")(uri);
 
 db.then(() => {
   console.log("Successfully connected to MongoDB");
-});
-
-process.on("SIGINT", function () {
   db.close();
 });
 
