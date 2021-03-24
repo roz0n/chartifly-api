@@ -1,5 +1,5 @@
 const db = require("../db");
-const SpotifyDataService = require("../services/SpotifyDataService");
+const SpotifyDataService = require("../services/SpotifyData.service");
 
 async function spotifyAuth(req, res, next) {
   try {

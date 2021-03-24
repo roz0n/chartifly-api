@@ -1,7 +1,7 @@
 const db = require("../db");
 const axios = require("axios");
 const querystring = require("querystring");
-const Token = require("../models/Token");
+const Token = require("../models/Token.model");
 
 class SpotifyDataService {
   CLIENT_ID = process.env.CLIENT_ID;

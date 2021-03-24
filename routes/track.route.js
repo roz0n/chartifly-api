@@ -1,7 +1,7 @@
 const axios = require("axios");
 const db = require("../db");
 const spotifyAuthMiddleware = require("../middleware/spotifyAuth.middleware");
-const SpotifyDataService = require("../services/SpotifyDataService");
+const SpotifyDataService = require("../services/SpotifyData.service");
 const express = require("express");
 const router = express.Router();
 

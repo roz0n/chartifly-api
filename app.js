@@ -10,9 +10,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-const indexRouter = require("./routes/index");
-const trackRouter = require("./routes/track");
-const tracklistRouter = require("./routes/tracklist");
+const indexRouter = require("./routes/index.route");
+const trackRouter = require("./routes/track.route");
+const tracklistRouter = require("./routes/tracklist.route");
 
 app.use("/", indexRouter);
 app.use("/track", trackRouter);

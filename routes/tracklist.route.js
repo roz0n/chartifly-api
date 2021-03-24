@@ -1,6 +1,6 @@
 const csv = require("csvtojson");
 const axios = require("axios");
-const SpotifyDataService = require("../services/SpotifyDataService");
+const SpotifyDataService = require("../services/SpotifyData.service");
 const express = require("express");
 const router = express.Router();
 
