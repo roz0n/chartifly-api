@@ -1,5 +1,5 @@
 const axios = require("axios");
-const querystring = require("querystring");
+// const querystring = require("querystring");
 const csv = require("csvtojson");
 const db = require("../db");
 // const { Token } = "../models/Token";
@@ -9,27 +9,27 @@ const express = require("express");
 const router = express.Router();
 
 // CREDS
-const CLIENT_ID = process.env.CLIENT_ID;
-const CLIENT_SECRET = process.env.CLIENT_SECRET;
+// const CLIENT_ID = process.env.CLIENT_ID;
+// const CLIENT_SECRET = process.env.CLIENT_SECRET;
 
-function encodeCredentials(id, secret) {
-  const data = `${id}:${secret}`;
-  const buffer = Buffer.from(data);
-  return buffer.toString("base64");
-}
+// function encodeCredentials(id, secret) {
+//   const data = `${id}:${secret}`;
+//   const buffer = Buffer.from(data);
+//   return buffer.toString("base64");
+// }
 
 // TOKEN HELPERS
-function Token(token, type, creationDate, expirationDate) {
-  this.token = token;
-  this.type = type;
-  this.creationDate = creationDate;
-  this.expirationDate = expirationDate;
-}
+// function Token(token, type, creationDate, expirationDate) {
+//   this.token = token;
+//   this.type = type;
+//   this.creationDate = creationDate;
+//   this.expirationDate = expirationDate;
+// }
 
-function handleTokenDates(currentTime, expirationTime) {
-  const expirationMs = expirationTime * 1000;
-  return new Date(currentTime.getTime() + expirationMs);
-}
+// function handleTokenDates(currentTime, expirationTime) {
+//   const expirationMs = expirationTime * 1000;
+//   return new Date(currentTime.getTime() + expirationMs);
+// }
 
 // TEST ROUTE
 router.get("/", function (req, res, next) {
@@ -38,44 +38,44 @@ router.get("/", function (req, res, next) {
 
 // SPOTIFY CLIENT-CREDENTIALS FLOW
 // TODO: I don't think this needs to be a publicly accessible route
-router.get("/token", async (req, res, next) => {
-  try {
-    const collection = db.get("token");
-    const body = { grant_type: "client_credentials" };
-    const endpoint = "https://accounts.spotify.com/api/token";
+// router.get("/token", async (req, res, next) => {
+//   try {
+//     const collection = db.get("token");
+//     const body = { grant_type: "client_credentials" };
+//     const endpoint = "https://accounts.spotify.com/api/token";
 
-    const { data } = await axios({
-      method: "post",
-      url: endpoint,
-      headers: {
-        Authorization: `Basic ${encodeCredentials(CLIENT_ID, CLIENT_SECRET)}`,
-      },
-      data: querystring.stringify(body),
-    });
+//     const { data } = await axios({
+//       method: "post",
+//       url: endpoint,
+//       headers: {
+//         Authorization: `Basic ${encodeCredentials(CLIENT_ID, CLIENT_SECRET)}`,
+//       },
+//       data: querystring.stringify(body),
+//     });
 
-    const currentTime = new Date();
+//     const currentTime = new Date();
 
-    const token = new Token(
-      data.access_token,
-      data.token_type,
-      currentTime,
-      handleTokenDates(currentTime, data.expires_in)
-    );
+//     const token = new Token(
+//       data.access_token,
+//       data.token_type,
+//       currentTime,
+//       handleTokenDates(currentTime, data.expires_in)
+//     );
 
-    await collection.insert(token);
-    await db.close();
+//     await collection.insert(token);
+//     await db.close();
 
-    res.send({
-      success: true,
-    });
-  } catch (error) {
-    console.log("Error:", error);
-    res.status(500).send({
-      success: false,
-      error: "Spotify authentication failure",
-    });
-  }
-});
+//     res.send({
+//       success: true,
+//     });
+//   } catch (error) {
+//     console.log("Error:", error);
+//     res.status(500).send({
+//       success: false,
+//       error: "Spotify authentication failure",
+//     });
+//   }
+// });
 
 // TRACKLIST
 router.get("/tracklist/:region", async (req, res, next) => {
