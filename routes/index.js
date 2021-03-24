@@ -3,9 +3,12 @@ const querystring = require("querystring");
 const csv = require("csvtojson");
 const db = require("../db");
 // const { Token } = "../models/Token";
+const spotifyAuth = require("../middleware/spotifyAuth");
 
 const express = require("express");
 const router = express.Router();
+
+router.use(spotifyAuth);
 
 // CREDS
 const CLIENT_ID = process.env.CLIENT_ID;
