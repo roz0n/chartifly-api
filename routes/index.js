@@ -1,6 +1,8 @@
 const axios = require("axios");
 const querystring = require("querystring");
 const csv = require("csvtojson");
+const db = require("../db");
+// const { Token } = "../models/Token";
 
 const express = require("express");
 const router = express.Router();
@@ -15,14 +17,22 @@ function encodeCredentials(id, secret) {
   return buffer.toString("base64");
 }
 
+function Token(token, type, expiration) {
+  this.token = token;
+  this.type = type;
+  this.expiration = expiration;
+}
+
 // TEST ROUTE
 router.get("/", function (req, res, next) {
   res.send({ success: true });
 });
 
 // SPOTIFY CLIENT-CREDENTIALS FLOW
+// TODO: I don't think this needs to be a publicly accessible route
 router.get("/token", async (req, res, next) => {
   try {
+    const collection = db.get("tokens");
     const body = { grant_type: "client_credentials" };
     const endpoint = "https://accounts.spotify.com/api/token";
 
@@ -35,15 +45,22 @@ router.get("/token", async (req, res, next) => {
       data: querystring.stringify(body),
     });
 
+    // TODO: This could be in a middleware
+    const token = new Token(
+      data.access_token,
+      data.token_type,
+      // TODO: Do date math
+      data.expires_in
+    );
+    collection.insert(token);
+
     // TODO: This doesn't need to be stored in the client, this token is for the server to make subsequent requests
     // Store this token and its expiration in the DB
     res.send({
       success: true,
-      token: data.access_token,
-      type: data.token_type,
-      expiration: data.expires_in,
     });
   } catch (error) {
+    console.log("Error:", error);
     res.status(500).send({
       success: false,
       error: "Failed to obtain access token",
@@ -101,7 +118,7 @@ router.get("/track/:id", async (req, res, next) => {
 
     res.send({
       success: true,
-      data
+      data,
     });
   } catch (error) {
     res.status(500).send({
