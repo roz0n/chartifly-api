@@ -9,8 +9,7 @@ class SpotifyDataService {
 
   endpoints = {
     getToken: "https://accounts.spotify.com/api/token",
-    getTracklist: (region) =>
-      `https://spotifycharts.com/regional/${region}/daily/latest/download`,
+    getTracklist: (region) => `https://spotifycharts.com/regional/${region}/daily/latest/download`,
     getTrack: (id) => `https://api.spotify.com/v1/tracks/${id}`,
   };
 
