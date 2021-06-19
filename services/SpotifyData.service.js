@@ -2,6 +2,7 @@ const db = require("../db");
 const axios = require("axios");
 const querystring = require("querystring");
 const Token = require("../models/Token.model");
+const { token } = require("morgan");
 
 class SpotifyDataService {
   CLIENT_ID = process.env.CLIENT_ID;
@@ -9,7 +10,8 @@ class SpotifyDataService {
 
   endpoints = {
     getToken: "https://accounts.spotify.com/api/token",
-    getTracklist: (region) => `https://spotifycharts.com/regional/${region}/daily/latest/download`,
+    getTracklist: (region) =>
+      `https://spotifycharts.com/regional/${region}/daily/latest/download`,
     getTrack: (id) => `https://api.spotify.com/v1/tracks/${id}`,
   };
 
@@ -34,18 +36,18 @@ class SpotifyDataService {
         },
         data: querystring.stringify(body),
       });
-      const currentTime = new Date();
+      const currentDate = new Date();
+      const expirationDate = currentDate;
+      expirationDate.setSeconds(currentDate.getSeconds() + data.expires_in);
+
       const token = new Token(
         data.access_token,
         data.token_type,
-        currentTime,
-        null
+        currentDate,
+        expirationDate
       );
-      token.expirationDate = token.calculateExpirationDate(
-        currentTime,
-        token.expires_in
-      );
-      await collection.insert(token);      
+
+      await collection.insert(token);
       return token;
     } catch (error) {
       console.log("Error issuing auth token:", error.stack);

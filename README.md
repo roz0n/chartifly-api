@@ -1,1 +1,1 @@
-# chartifly-api
+# spotify-api
