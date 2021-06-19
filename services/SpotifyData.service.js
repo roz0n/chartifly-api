@@ -13,6 +13,7 @@ class SpotifyDataService {
     getTracklist: (region) =>
       `https://spotifycharts.com/regional/${region}/daily/latest/download`,
     getTrack: (id) => `https://api.spotify.com/v1/tracks/${id}`,
+    getRecentyPlayed: "https://api.spotify.com/v1/me/player/recently-played",
   };
 
   encodeCredentials(id, secret) {
@@ -24,7 +25,10 @@ class SpotifyDataService {
   async issueToken() {
     try {
       const collection = db.get("token");
-      const body = { grant_type: "client_credentials" };
+      const body = {
+        grant_type: "client_credentials",
+        scope: "user-read-recently-played"
+      };
       const { data } = await axios({
         method: "post",
         url: this.endpoints.getToken,
@@ -36,9 +40,10 @@ class SpotifyDataService {
         },
         data: querystring.stringify(body),
       });
+      
       const currentDate = new Date();
-      const expirationDate = currentDate;
-      expirationDate.setSeconds(currentDate.getSeconds() + data.expires_in);
+      const expirationDate = new Date;
+      expirationDate.setSeconds(expirationDate.getSeconds() + data.expires_in);
 
       const token = new Token(
         data.access_token,
